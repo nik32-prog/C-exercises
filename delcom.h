@@ -36,22 +36,28 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
 }
 
 void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool keep_str, tagchar_t *str, int index) {
-  switch((*(str + index)).s) {
+  switch(str[index].s) {
     case '/':
+      if (*instr) {
+        break;
+      }
       if ( *inlncom ) {
-        (*(str + index)).tag = TAG_COMM;
+        str[index].tag = TAG_COMM;
       } else if ( !( *incom ) && !( *inlncom ) && !( *slash )) {
         *slash = true;
       } else if ( *slash && !( *astr ) ) {
         *inlncom = true;
-        (*(str + index)).tag     = TAG_COMM;
-        (*(str + index - 1)).tag = TAG_COMM;
+        str[index].tag     = TAG_COMM;
+        str[index - 1].tag = TAG_COMM;
       } else if ( *closingastr ) {
         *inlncom = *astr = *closingastr = *slash = *incom = false;
-        (*(str + index)).tag = TAG_COMM;
+        str[index].tag = TAG_COMM;
       }
       break;
     case '*':
+      if (*instr) {
+        break;
+      }
       if ( *inlncom ) {
         ;
       } else if ( !( *slash ) ) {
@@ -59,8 +65,8 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
       } else if ( *slash && !( *astr ) ) {
         *astr = true;
         *incom = true;
-        (*(str + index - 1)).tag = TAG_COMM;
-        (*(str + index)).tag     = TAG_COMM;
+        str[index - 1].tag = TAG_COMM;
+        str[index].tag     = TAG_COMM;
       } else if ( *astr ) {
         *closingastr = true;
       }
@@ -68,32 +74,36 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
     case '\n':
       if ( *inlncom ) {
         *inlncom = false;
-        (*(str + index)).tag = TAG_COMM;
+        str[index].tag = TAG_COMM;
       } else {
-        (*(str + index)).tag = TAG_KEEP;
+        str[index].tag = TAG_KEEP;
       }
       *closingastr = false;
       break;
     case '\"':
+      if (*incom || *inlncom) {
+        break;
+      }
       if (!keep_str) {
         if (*instr) {
-          (*(str + index)).tag = TAG_COMM;
+          str[index].tag = TAG_COMM;
           *instr = false;
         } else {
           *instr = true;
         }
       }
       break;
+      
     default:
-      (*(str + index)).tag = TAG_KEEP;
+      str[index].tag = TAG_KEEP;
       *closingastr = false;
   }
   if (*incom || *inlncom || (*instr && !keep_str)) {
-    (*(str + index)).tag = TAG_COMM;
-  } else if ((*(str + index)).tag != TAG_COMM){
-    (*(str + index)).tag = TAG_KEEP;
+    str[index].tag = TAG_COMM;
+  } else if (str[index].tag != TAG_COMM){
+    str[index].tag = TAG_KEEP;
   }
-  if ((*(str + index)).s != '/' && (*(str + index)).s != '*' && !( *incom ) && !( *inlncom )) {
+  if (str[index].s != '/' && str[index].s != '*' && !( *incom ) && !( *inlncom )) {
     *slash = *astr = *closingastr = false;
   }
 }

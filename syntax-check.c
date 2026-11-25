@@ -32,7 +32,7 @@ typedef struct {
   int         retval;
 }           ret_stat;
 
-typedef unsigned long int idx_t;
+typedef long int idx_t;
 
 static inline void update_surround(char item, char *surround) {
   del(surround, SURROUND_LEN, 0, 0);
@@ -146,11 +146,18 @@ int main(void) {
       break;
     }
   }
-  if (status.retval == -1) {
+  if (curr_ind >= 1 && status.retval == 0) {
+    printf("error: unclosed brace at the end!!!\n");
+    printf("fix: add \"");
+    for(int i = curr_ind; i > 0; i--) {
+      printf("%c", stack[i].b.end_brace);
+    }
+    printf("\" at the end\n");
+  } else if (status.retval == -1) {
     printf("error: %s", status.stat);
   } else if (status.retval == 1) {
     printf("%s: expected %c, but found %c\n", status.stat, status.expected, status.found);
-    printf("details:\n\tline number: %d\n\tsurroundings: \n<%s>\n\tcurrent stack frame:\n\t\tnumber: %d\n\t\tstarting brace: %c\n\t\tending brace: %c\n", err.line + 1, err.surroundings, err.current_frame, err.stack[err.current_frame].b.start_brace, err.stack[err.current_frame].b.end_brace);
+    printf("details:\n\tline number: %d\n\tsurroundings: \n%s\n\tcurrent stack frame:\n\t\tnumber: %d\n\t\tstarting brace: %c\n\t\tending brace: %c\n", err.line + 1, err.surroundings, err.current_frame, err.stack[err.current_frame].b.start_brace, err.stack[err.current_frame].b.end_brace);
     printf("\tcurrent stack frames:\n");
     for(int i = 1; i <= curr_ind; i++) {
       printf("\t\tstack frame: %d\n", i);

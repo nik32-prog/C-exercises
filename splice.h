@@ -6,6 +6,7 @@ void wipe(int array[], int size) {
   for (int i = 0; i < size; i++) {
     array[i] = 0;
   }
+  return;
 }
 
 // i is the starting position, j is the ending position
@@ -16,6 +17,9 @@ int swap(char str[], int size, int i, int j) {
   }
   char tmp;
   tmp = str[i];
+  str[i] = str[j];
+  str[j] = tmp;
+  return 0;
 }
 
 // size should be the char str[size] in initialization
@@ -69,6 +73,7 @@ int del(char str[], int size, int datasize, int index) {
   for (int i = 0; i < datasize - index; i++) {
     str[index + i] = str[index + i + 1];
   }
+  return 0;
 }
 
 #endif
