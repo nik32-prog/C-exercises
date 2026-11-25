@@ -109,8 +109,8 @@ int main(void) {
     if (og_curr_item == '\n') {
       curr_line++;
     }
-    if (i >= SURROUND_LEN / 2) {
-      update_surround(curr_item, curr_surround);
+    if (i >= SURROUND_LEN / 2 && i <= j - SURROUND_LEN / 2) {
+      update_surround(txt[i + SURROUND_LEN / 2], curr_surround);
     }
     for (int j = 0; j < BRACE_TYPES; j++) {
       char currStartBrace = braces[j].start_brace;
@@ -158,6 +158,8 @@ int main(void) {
       printf("\t\tstart brace: %c\n", err.stack[i].b.start_brace);
       printf("\t\tend brace: %c\n", err.stack[i].b.end_brace);
     }
+  } else {
+    printf("no bracket-related errors found!\n");
   }
   return status.retval;
 }
