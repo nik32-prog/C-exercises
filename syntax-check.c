@@ -4,7 +4,7 @@
 #define  SURROUND_LEN 20
 #define  BUFSIZE 100000
 #define  STACKSIZE 1000
-#define  BRACE_TYPES  2
+#define  BRACE_TYPES  3
 
 typedef  char brace;
 
@@ -104,7 +104,25 @@ int main(void) {
   }
 
   for(idx_t i = 0; i < j; i++) {
+    char curr_item = txt[i];
+    if (curr_item == '\n') {
+      curr_line++;
+    }
     
+    for (int j = 0; j < BRACE_TYPES) {
+      char currStartBrace = braces[j].start_brace;
+      char currEndBrace   = braces[j].end_brace;
+      if (curr_item == currStartBrace) {
+        stack_frame tmp;
+        tmp.b.start_brace = currStartBrace;
+        tmp.b.end_brace   = currEndBrace;
+        tmp.line = curr_line;
+        if (push(tmp, stack, &curr_ind) == -1) {
+          printf("fatal: stack size too small... exiting...\n");
+          
+        }
+      }
+    }
   }
   
   return status.retval;
