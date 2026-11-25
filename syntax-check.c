@@ -109,7 +109,7 @@ int main(void) {
       curr_line++;
     }
     
-    for (int j = 0; j < BRACE_TYPES) {
+    for (int j = 0; j < BRACE_TYPES; j++) {
       char currStartBrace = braces[j].start_brace;
       char currEndBrace   = braces[j].end_brace;
       if (curr_item == currStartBrace) {
@@ -127,7 +127,15 @@ int main(void) {
         if (currEndBrace == stack[curr_ind].b.end_brace) {
           pop(stack, &curr_ind);
         } else {
-          
+          err.line = curr_line;
+          err.stack = stack;
+          err.current_frame = curr_ind;
+          err.surroundings = curr_surround;
+          status.retval = 1;
+          status.stat = "syntax error";
+          status.expected = stack[curr_ind].b.end_brace;
+          status.found = curr_item;
+          break;
         }
       }
     }
@@ -135,6 +143,6 @@ int main(void) {
       break;
     }
   }
-  
+  printf("%d\n", status.retval);
   return status.retval;
 }
