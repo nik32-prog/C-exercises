@@ -35,7 +35,7 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
   return arr;
 }
 
-void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool keep_str, tagchar_t *str, int index) {
+void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   switch(str[index].s) {
     case '/':
       if (*instr) {
@@ -81,7 +81,7 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
       *closingastr = false;
       break;
     case '\"':
-      if (*incom || *inlncom) {
+      if (*incom || *inlncom || *escaped) {
         break;
       }
       if (!keep_str) {
@@ -93,12 +93,34 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
         }
       }
       break;
-      
+    case '\'':
+      if (*incom || *inlncom || *escaped || *instr) {
+        break;
+      }
+      if (!keep_str) {
+        if (*insinglestr) {
+          str[index].tag = TAG_COMM;
+          *insinglestr = false;
+        } else {
+          *insinglestr = true;
+        }
+      }
+      break;
+    case '\\':
+      if (*incom || *inlncom) {
+        break;
+      }
+      *escaped = true;
+      str[index].tag = TAG_COMM;
+      break;      
     default:
       str[index].tag = TAG_KEEP;
+      if (*escaped == true) {
+        *escaped = false;
+      }
       *closingastr = false;
   }
-  if (*incom || *inlncom || (*instr && !keep_str)) {
+  if (*incom || *inlncom || (*instr && !keep_str) || *escaped || (*insinglestr && !keep_str)) {
     str[index].tag = TAG_COMM;
   } else if (str[index].tag != TAG_COMM){
     str[index].tag = TAG_KEEP;
@@ -120,9 +142,9 @@ tagged_arr init(char txt[], bool keep_str) {
   }
   str[i].s = '\0';
   str[i].tag = TAG_END;
-  bool incom = false, inlncom = false, slash = false, astr = false, closingastr = false, instr = false;
+  bool incom = false, escaped = false, isinsinglestr = false, inlncom = false, slash = false, astr = false, closingastr = false, instr = false;
   for(int j = 0; j < i; j++) {
-    resolvecoms(&incom, &inlncom, &slash, &astr, &closingastr, &instr, keep_str, str, j);
+    resolvecoms(&incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &isinsinglestr, keep_str, str, j);
   }
   return delTaggedComsAndPrint(str, i, buf);
 }
