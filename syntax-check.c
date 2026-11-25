@@ -87,6 +87,7 @@ int main(void) {
     s[i] = c;
     i++;
   }
+  s[i] = '\0';
   idx_t j = (idx_t)i;
   // delete the comments...
   // idk why i called the function init, but that's just how it is...

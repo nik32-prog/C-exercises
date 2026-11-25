@@ -110,9 +110,10 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
 
 tagged_arr init(char txt[], bool keep_str) {
   tagchar_t str[MXLEN];
-  char s, buf[MXLEN];
+  char s;
+  static char buf[MXLEN];
   int i = 0;
-  while((s = txt[i]) != EOF) {
+  while((s = txt[i]) != '\0') {
     str[i].s = s;
     str[i].tag = TAG_NONE;
     i++;
