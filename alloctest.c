@@ -11,6 +11,7 @@ void main() {
     p2 = alloc(9000000000);
     afree(p2);
   }
+  p2 = alloc(9000000000);
   // ok now let's make a couple more pointers...
   p3 = alloc(64000);
   // this should return 0...

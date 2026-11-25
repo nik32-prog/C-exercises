@@ -119,9 +119,20 @@ int main(void) {
         tmp.line = curr_line;
         if (push(tmp, stack, &curr_ind) == -1) {
           printf("fatal: stack size too small... exiting...\n");
+          status.retval = -1;
+          status.stat = "stack too small\n";
+          break;
+        }
+      } else if (curr_item == currEndBrace) {
+        if (currEndBrace == stack[curr_ind].b.end_brace) {
+          pop(stack, &curr_ind);
+        } else {
           
         }
       }
+    }
+    if (status.retval == -1 || status.retval == 1) {
+      break;
     }
   }
   
