@@ -105,10 +105,13 @@ int main(void) {
 
   for(idx_t i = 0; i < j; i++) {
     char curr_item = txt[i];
-    if (curr_item == '\n') {
+    char og_curr_item = s[i];
+    if (og_curr_item == '\n') {
       curr_line++;
     }
-    
+    if (i >= SURROUND_LEN / 2) {
+      update_surround(curr_item, curr_surround);
+    }
     for (int j = 0; j < BRACE_TYPES; j++) {
       char currStartBrace = braces[j].start_brace;
       char currEndBrace   = braces[j].end_brace;
@@ -143,6 +146,18 @@ int main(void) {
       break;
     }
   }
-  printf("%d\n", status.retval);
+  if (status.retval == -1) {
+    printf("error: %s", status.stat);
+  } else if (status.retval == 1) {
+    printf("%s: expected %c, but found %c\n", status.stat, status.expected, status.found);
+    printf("details:\n\tline number: %d\n\tsurroundings: \n<%s>\n\tcurrent stack frame:\n\t\tnumber: %d\n\t\tstarting brace: %c\n\t\tending brace: %c\n", err.line + 1, err.surroundings, err.current_frame, err.stack[err.current_frame].b.start_brace, err.stack[err.current_frame].b.end_brace);
+    printf("\tcurrent stack frames:\n");
+    for(int i = 1; i <= curr_ind; i++) {
+      printf("\t\tstack frame: %d\n", i);
+      printf("\t\tline: %d\n", err.stack[i].line + 1);
+      printf("\t\tstart brace: %c\n", err.stack[i].b.start_brace);
+      printf("\t\tend brace: %c\n", err.stack[i].b.end_brace);
+    }
+  }
   return status.retval;
 }
