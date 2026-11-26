@@ -102,6 +102,32 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
       } else if (*slash && !*astr) {
         *slash = false;
       }
+
+      *escaped = true;
+      str[index].tag = TAG_COMM;
+      break;
+    case '/':
+      if (*escaped || (*incom && !*closingastr) || *inlncom) {
+        str[index].tag = TAG_COMM;
+        break;
+      } else if (*insinglestr || *instr) {
+        if (!keep_str) {
+          str[index].tag = TAG_COMM;
+        } else {
+          str[index].tag = TAG_KEEP;
+        }
+        break;
+      }
+      if (!*closingastr) {
+        *slash = true;
+        str[index].tag = TAG_KEEP;
+        break;
+      } else {
+        *incom = false;
+        str[index].tag = TAG_COMM;
+        break;
+      }
+    
   }
 
 
