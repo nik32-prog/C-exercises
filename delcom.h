@@ -41,6 +41,7 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
     case '\'':
       if (*slash && *astr && *closingastr) {
         *closingastr = false;
+        str[index].tag = TAG_COMM;
         break;
       } else if (*incom || *inlncom || *escaped || *instr) {
         break;
@@ -65,9 +66,11 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
       break;
     case '\"':
       if (*slash && *astr && *closingastr) {
+        str[index].tag = TAG_COMM;
         *closingastr = false;
         break;
       } else if (*incom || *inlncom || *escaped || *insinglestr) {
+        str[index].tag = TAG_COMM;
         break;
       } else if (*slash && !*astr) {
         *slash = false;
@@ -89,7 +92,12 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
       }
       break;
     case '\\':
-      if (*incom || *inlncom || *escaped) {
+      if (*slash && *astr && *closingastr) {
+        *closingastr = false;
+        str[index].tag = TAG_COMM;
+        break;
+      } else if (*incom || *inlncom || *escaped) {
+        str[index].tag = TAG_COMM;
         break;
       } else if (*slash && !*astr) {
         *slash = false;
