@@ -29,14 +29,14 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
       buf[i] = str[i].s;
     }
   }
-  tagged_arr arr;
+  static tagged_arr arr;
   arr.size = (unsigned long int) size;
   arr.s = buf;
   return arr;
 }
 
-void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
-
+int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  int retval = 0;
   switch(str[index].s) {
     case '\'':
       if (*slash && *astr && *closingastr) {
@@ -122,15 +122,63 @@ void resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *clos
         *slash = true;
         str[index].tag = TAG_KEEP;
         break;
-      } else {
+      } else if (!*closingastr && *slash) {
         *incom = false;
         str[index].tag = TAG_COMM;
         break;
+      } else {
+        *inlncom = true;
+        str[index    ].tag = TAG_COMM;
+        str[index - 1].tag = TAG_COMM;
+        break;
+      }
+    case '*':
+      if (*inlncom || *escaped || *instr || *insinglestr) {
+        str[index].tag = TAG_COMM;
+        break;
+      } else if (!*incom && !*slash) {
+        str[index].tag = TAG_KEEP;
+        break;
+      }
+      if (*slash && !*incom) {
+        *astr = true;
+        *incom = true;
+        str[index    ].tag = TAG_COMM;
+        str[index - 1].tag = TAG_COMM;
+        break;
+      } else if (*incom && !*closingastr) {
+        str[index].tag = TAG_COMM;
+        *closingastr = true;
+        break;
+      } else if (*incom && *closingastr) {
+        str[index].tag = TAG_COMM;
+        *closingastr = true;
+        break;
+      }
+    case '\n':
+      if (*instr || *insinglestr) {
+        retval = -1; // syntax error
+        break;
+      } else if (*inlncom) {
+        *inlncom = false;
+        str[index].tag = TAG_COMM;
+      } else {
+        // just a new line
+        str[index].tag = TAG_KEEP;
+        break;
+      }
+    default:
+      if (*incom || *inlncom) {
+        str[index].tag = TAG_COMM;
+      } else if ((*instr || *insinglestr) && !keep_str) {
+        str[index].tag = TAG_COMM;
+      } else {
+        str[index].tag = TAG_KEEP;
       }
     
+       
   }
-
-
+  return retval;
 }
 
 tagged_arr init(char txt[], bool keep_str) {
@@ -147,7 +195,12 @@ tagged_arr init(char txt[], bool keep_str) {
   str[i].tag = TAG_END;
   bool incom = false, escaped = false, isinsinglestr = false, inlncom = false, slash = false, astr = false, closingastr = false, instr = false;
   for(int j = 0; j < i; j++) {
-    resolvecoms(&incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &isinsinglestr, keep_str, str, j);
+    if (resolvecoms(&incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &isinsinglestr, keep_str, str, j) == -1) {
+      static tagged_arr retarr;
+      retarr.s = "syntax error\n";
+      retarr.size = -1;
+      return retarr;
+    }
   }
   return delTaggedComsAndPrint(str, i, buf);
 }
