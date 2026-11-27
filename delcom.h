@@ -14,8 +14,8 @@ typedef struct {
 } tagchar_t;
 
 typedef struct {
-  char                *s;
-  unsigned long int size;
+  char       *s;
+  long int size;
 } tagged_arr;
 
 tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
@@ -24,7 +24,6 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
   }
   
   for (int i = 0; i < size; i++) {
-    // printf("char:\t%c\ttag:\t%c\t\t", (*(str + i)).s, (*(str + i)).tag);
     if (str[i].tag == TAG_KEEP) {
       buf[i] = str[i].s;
     }
@@ -37,6 +36,11 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
 
 int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   int retval = 0;
+  if (*escaped) {
+    str[index].tag = TAG_COMM;
+    *escaped = false;
+    return 0;
+  }
   switch(str[index].s) {
     case '\'':
       if (*slash && *astr && *closingastr) {
@@ -132,6 +136,7 @@ int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closi
         str[index - 1].tag = TAG_COMM;
         break;
       }
+      break;
     case '*':
       if (*inlncom || *escaped || *instr || *insinglestr) {
         str[index].tag = TAG_COMM;
@@ -155,6 +160,7 @@ int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closi
         *closingastr = true;
         break;
       }
+      break;
     case '\n':
       if (*instr || *insinglestr) {
         retval = -1; // syntax error
@@ -167,6 +173,7 @@ int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closi
         str[index].tag = TAG_KEEP;
         break;
       }
+      break;
     default:
       if (*incom || *inlncom) {
         str[index].tag = TAG_COMM;
@@ -175,6 +182,10 @@ int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closi
       } else {
         str[index].tag = TAG_KEEP;
       }
+      if (*closingastr) {
+        *closingastr = false;
+      }
+      break;
     
        
   }

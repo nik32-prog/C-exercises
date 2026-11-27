@@ -95,7 +95,10 @@ int main(void) {
   tagged_arr tmp_txt;
   tmp_txt = init(s, false);
   txt = tmp_txt.s;
-
+  if (tmp_txt.size == -1) {
+    printf("syntax error: new line inside of a string\nconsider using \\n...\n");
+    return -1;
+  }
   // alr time to actually check some syntax !!!
   synt_error err;
   unsigned long int curr_line = 0;
