@@ -34,162 +34,44 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
   return arr;
 }
 
-int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
-  int retval = 0;
-  if (*escaped) {
-    str[index].tag = TAG_COMM;
-    *escaped = false;
-    return 0;
-  }
-  switch(str[index].s) {
-    case '\'':
-      if (*slash && *astr && *closingastr) {
-        *closingastr = false;
-        str[index].tag = TAG_COMM;
-        break;
-      } else if (*incom || *inlncom || *escaped || *instr) {
-        break;
-      } else if (*slash && !*astr) {
-        *slash = false;
-      }
-      if (*insinglestr) {
-        *insinglestr = false;
-        if (!keep_str) {
-          str[index].tag = TAG_COMM;
-        } else {
-          str[index].tag = TAG_KEEP;
-        }
-      } else {
-        *insinglestr = true;
-        if (!keep_str) {
-          str[index].tag = TAG_COMM;
-        } else {
-          str[index].tag = TAG_KEEP;
-        }
-      }
-      break;
-    case '\"':
-      if (*slash && *astr && *closingastr) {
-        str[index].tag = TAG_COMM;
-        *closingastr = false;
-        break;
-      } else if (*incom || *inlncom || *escaped || *insinglestr) {
-        str[index].tag = TAG_COMM;
-        break;
-      } else if (*slash && !*astr) {
-        *slash = false;
-      }
-      if (*instr) {
-        *instr = false;
-        if (!keep_str) {
-          str[index].tag = TAG_COMM;
-        } else {
-          str[index].tag = TAG_KEEP;
-        }
-      } else {
-        *instr = true;
-        if (!keep_str) {
-          str[index].tag = TAG_COMM;
-        } else {
-          str[index].tag = TAG_KEEP;
-        }
-      }
-      break;
-    case '\\':
-      if (*slash && *astr && *closingastr) {
-        *closingastr = false;
-        str[index].tag = TAG_COMM;
-        break;
-      } else if (*incom || *inlncom || *escaped) {
-        str[index].tag = TAG_COMM;
-        break;
-      } else if (*slash && !*astr) {
-        *slash = false;
-      }
 
-      *escaped = true;
-      str[index].tag = TAG_COMM;
-      break;
-    case '/':
-      if (*escaped || (*incom && !*closingastr) || *inlncom) {
-        str[index].tag = TAG_COMM;
-        break;
-      } else if (*insinglestr || *instr) {
-        if (!keep_str) {
-          str[index].tag = TAG_COMM;
-        } else {
-          str[index].tag = TAG_KEEP;
-        }
-        break;
-      }
-      if (!*closingastr) {
-        *slash = true;
-        str[index].tag = TAG_KEEP;
-        break;
-      } else if (!*closingastr && *slash) {
-        *incom = false;
-        str[index].tag = TAG_COMM;
-        break;
-      } else {
-        *inlncom = true;
-        str[index    ].tag = TAG_COMM;
-        str[index - 1].tag = TAG_COMM;
-        break;
-      }
-      break;
-    case '*':
-      if (*inlncom || *escaped || *instr || *insinglestr) {
-        str[index].tag = TAG_COMM;
-        break;
-      } else if (!*incom && !*slash) {
-        str[index].tag = TAG_KEEP;
-        break;
-      }
-      if (*slash && !*incom) {
-        *astr = true;
-        *incom = true;
-        str[index    ].tag = TAG_COMM;
-        str[index - 1].tag = TAG_COMM;
-        break;
-      } else if (*incom && !*closingastr) {
-        str[index].tag = TAG_COMM;
-        *closingastr = true;
-        break;
-      } else if (*incom && *closingastr) {
-        str[index].tag = TAG_COMM;
-        *closingastr = true;
-        break;
-      }
-      break;
-    case '\n':
-      if (*instr || *insinglestr) {
-        retval = -1; // syntax error
-        break;
-      } else if (*inlncom) {
-        *inlncom = false;
-        str[index].tag = TAG_COMM;
-      } else {
-        // just a new line
-        str[index].tag = TAG_KEEP;
-        break;
-      }
-      break;
-    default:
-      if (*incom || *inlncom) {
-        str[index].tag = TAG_COMM;
-      } else if ((*instr || *insinglestr) && !keep_str) {
-        str[index].tag = TAG_COMM;
-      } else {
-        str[index].tag = TAG_KEEP;
-      }
-      if (*closingastr) {
-        *closingastr = false;
-      }
-      break;
+void backslashhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
     
-       
+}
+
+void charhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+  
+}
+
+void quotehandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+  
+}
+
+void asterikhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+  
+}
+
+void slashhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+  
+}
+
+void defaulthandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+  
+}
+
+int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  switch(str[index].s) {
+    case '\\':
+      backslashhandler(&incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+    case '\'':
+      charhandler(     &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+    case '\"':
+      quotehandler(    &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+    case '/':
+      slashhandler(    &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+    case '*':
+      asterikhandler(  &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
   }
-  return retval;
 }
 
 tagged_arr init(char txt[], bool keep_str) {

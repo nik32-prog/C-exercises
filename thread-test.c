@@ -9,7 +9,7 @@
 void *calconnewthread(void *) {
   srand(time(NULL));
   while(1) {
-    static double d = sqrt(rand());
+    double d = sqrt(rand());
   }
   return NULL;
 }
