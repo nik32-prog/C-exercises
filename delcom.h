@@ -35,42 +35,50 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
 }
 
 
-void backslashhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
-    
-}
-
-void charhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+void backslashhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   
 }
 
-void quotehandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+void charhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   
 }
 
-void asterikhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+void quotehandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   
 }
 
-void slashhandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+void asterikhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   
 }
 
-void defaulthandler(bool incom, bool inlncom, bool slash, bool astr, bool closingastr, bool instr, bool escaped, bool insinglestr, bool keep_str, tagchar_t *str, int index) {
+void slashhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  
+}
+
+void defaulthandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   
 }
 
 int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
   switch(str[index].s) {
     case '\\':
-      backslashhandler(&incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+      backslashhandler(incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
+      break;
     case '\'':
-      charhandler(     &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+      charhandler(     incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
+      break;
     case '\"':
-      quotehandler(    &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+      quotehandler(    incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
+      break;
     case '/':
-      slashhandler(    &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+      slashhandler(    incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
+      break;
     case '*':
-      asterikhandler(  &incom, &inlncom, &slash, &astr, &closingastr, &instr, &escaped, &insinglestr, &keep_str, str, index);
+      asterikhandler(  incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
+      break;
+    default:
+      defaulthandler(  incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
+      break;
   }
 }
 
