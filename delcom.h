@@ -34,29 +34,99 @@ tagged_arr delTaggedComsAndPrint(tagchar_t *str, int size, char *buf) {
   return arr;
 }
 
+static inline void newlinehandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  if (*escaped) {
+    str[index].tag = TAG_COMM;
+    *escaped = false;
+    return;
+  } else if (*incom && !*closingastr) {
+    str[index].tag = TAG_COMM;
+    return;
+  } else if (*closingastr) {
+    *closingastr = false;
+    str[index].tag = TAG_COMM;
+    return;
+  } else if (*inlncom) {
+    str[index].tag = TAG_COMM;
+    *inlncom = false;
+    return;
+  } else {
+    str[index].tag = TAG_KEEP;
+    return;
+  }
+  return;
+}
 
-void backslashhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+static inline void backslashhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  if (*escaped) {
+    *escaped = false;
+    str[index].tag = TAG_COMM;
+    return;
+  } else if (*incom || *inlncom) {
+    str[index].tag = TAG_COMM;
+    return;
+  } else if (*slash && !*astr) {
+    *slash = false;
+  } else if (*closingastr) {
+    *closingastr = false;
+  }
+  if (!*escaped) {
+    str[index].tag = TAG_COMM;
+    *escaped = true;
+    return;
+  }
+  return;
+}
+
+static inline void charhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  if (*escaped) {
+    *escaped = false;
+    str[index].tag = TAG_COMM;
+    return;
+  } else if (*incom || *inlncom) {
+    str[index].tag = TAG_COMM;
+    return;
+  } else if (*slash && !*astr) {
+    *slash = false;
+  } else if (*closingastr) {
+    *closingastr = false;
+  }
   
 }
 
-void charhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
-  
+static inline void quotehandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  if (*escaped) {
+    *escaped = false;
+    str[index].tag = TAG_COMM;
+    return;
+  } else if (*incom || *inlncom) {
+    str[index].tag = TAG_COMM;
+    return;
+  }
 }
 
-void quotehandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
-  
+static inline void asterikhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  if (*escaped) {
+    *escaped = false;
+    str[index].tag = TAG_COMM;
+    return;
+  }  
 }
 
-void asterikhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
-  
+static inline void slashhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  if (*escaped) {
+    *escaped = false;
+    str[index].tag = TAG_COMM;
+    return;
+  }  
 }
 
-void slashhandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
-  
-}
-
-void defaulthandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
-  
+static inline void defaulthandler(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
+  if (*escaped) {
+    *escaped = false;
+    str[index].tag = TAG_COMM;
+    return;
+  }  
 }
 
 int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closingastr, bool *instr, bool *escaped, bool *insinglestr, bool keep_str, tagchar_t *str, int index) {
@@ -75,6 +145,9 @@ int resolvecoms(bool *incom, bool *inlncom, bool *slash, bool *astr, bool *closi
       break;
     case '*':
       asterikhandler(  incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
+      break;
+    case '\n':
+      newlinehandler(  incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
       break;
     default:
       defaulthandler(  incom, inlncom, slash, astr, closingastr, instr, escaped, insinglestr, keep_str, str, index);
